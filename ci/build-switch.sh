@@ -39,3 +39,11 @@ cp libs/mupdf/build/release/libmupdf-third.a libs/mupdf/lib/
 make -j2
 test -s LeafReader.nro
 sha256sum LeafReader.nro > LeafReader.nro.sha256
+
+if [[ -n "${CRASH_ADDRESSES:-}" ]]; then
+  read -r -a addresses <<< "$CRASH_ADDRESSES"
+  for address in "${addresses[@]}"; do
+    [[ "$address" =~ ^(0x)?[[:xdigit:]]+$ ]] || { echo "Invalid crash offset" >&2; exit 1; }
+  done
+  aarch64-none-elf-addr2line -a -f -C -e LeafReader.elf "${addresses[@]}"
+fi

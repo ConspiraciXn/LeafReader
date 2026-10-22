@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      crash_addresses:
+        description: Optional space-separated hexadecimal offsets to resolve in this build
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -27,9 +32,12 @@ jobs:
         run: docker pull devkitpro/devkita64:latest
 
       - name: Build with the Switch toolchain
+        env:
+          CRASH_ADDRESSES: ${{ inputs.crash_addresses }}
         run: |
           docker image inspect devkitpro/devkita64:latest --format '{{index .RepoDigests 0}}' > toolchain-image.log
           docker run --rm \
+            -e CRASH_ADDRESSES \
             -v "$GITHUB_WORKSPACE:/work" -w /work \
             devkitpro/devkita64:latest bash ci/build-switch.sh
 
@@ -40,6 +48,8 @@ jobs:
           path: |
             LeafReader.nro
             LeafReader.nro.sha256
+            LeafReader.elf
+            LeafReader.map
             toolchain-packages.log
             toolchain-image.log
           if-no-files-found: error
