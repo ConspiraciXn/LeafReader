@@ -8,6 +8,9 @@
 *.d
 a.out
 build/
+LeafReader.nro.sha256
+toolchain-packages.log
+toolchain-image.log
 
 # Executables
 EbookViewerNX_pc

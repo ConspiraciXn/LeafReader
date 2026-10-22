@@ -1,0 +1,46 @@
+name: Build LeafReader for Switch
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: switch-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out source and dependencies
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Pull official devkitPro image
+        run: docker pull devkitpro/devkita64:latest
+
+      - name: Build with the Switch toolchain
+        run: |
+          docker image inspect devkitpro/devkita64:latest --format '{{index .RepoDigests 0}}' > toolchain-image.log
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/work" -w /work \
+            devkitpro/devkita64:latest bash ci/build-switch.sh
+
+      - name: Upload Switch executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: LeafReader-Switch-${{ github.run_number }}
+          path: |
+            LeafReader.nro
+            LeafReader.nro.sha256
+            toolchain-packages.log
+            toolchain-image.log
+          if-no-files-found: error
+          retention-days: 30

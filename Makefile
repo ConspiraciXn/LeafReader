@@ -37,7 +37,8 @@ include $(DEVKITPRO)/libnx/switch_rules
 #   of a homebrew executable (.nro). This is intended to be used for sysmodules.
 #   NACP building is skipped as well.
 #---------------------------------------------------------------------------------
-TARGET		:=	$(notdir $(CURDIR))
+TARGET		:=	LeafReader
+ICON		:=	icon.jpg
 BUILD		:=	build
 SOURCES		:=	source ./libs/log.c/src
 DATA		:=	data
@@ -48,7 +49,7 @@ MAJOR		:= 0
 MINOR		:= 2
 MICRO		:= 0
 
-APP_TITLE	:=	EbookViewerNX
+APP_TITLE	:=	LeafReader
 APP_AUTHOR	:=	SegFault42
 APP_VERSION	:=	${MAJOR}.${MINOR}.${MICRO}
 

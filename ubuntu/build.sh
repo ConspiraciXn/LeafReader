@@ -1,11 +1,11 @@
 #!/bin/bash
-# Build ReaderNX for Nintendo Switch
-# This script compiles the complete ReaderNX application
+# Build LeafReader for Nintendo Switch
+# This script compiles the complete LeafReader application
 
 set -e
 
 echo "========================================"
-echo "Building ReaderNX"
+echo "Building LeafReader"
 echo "========================================"
 
 # Check if DEVKITPRO is set
@@ -48,24 +48,24 @@ fi
 
 # Build the project
 echo ""
-echo "Building ReaderNX..."
+echo "Building LeafReader..."
 echo ""
 
 cd "$PROJECT_ROOT"
 make
 
 # Check if build was successful
-if [ -f "$PROJECT_ROOT/ReaderNX.nro" ]; then
+if [ -f "$PROJECT_ROOT/LeafReader.nro" ]; then
     echo ""
     echo "========================================"
     echo "✓ Build completed successfully!"
     echo "========================================"
     echo ""
-    echo "Output file: ReaderNX.nro"
-    echo "Size: $(du -h ReaderNX.nro | cut -f1)"
+    echo "Output file: LeafReader.nro"
+    echo "Size: $(du -h LeafReader.nro | cut -f1)"
     echo ""
     echo "To install on Switch:"
-    echo "  1. Copy ReaderNX.nro to /switch/ on your SD card"
+    echo "  1. Copy LeafReader.nro to /switch/ on your SD card"
     echo "  2. Create /switch/ebookViewerNX/ directory for your ebooks"
     echo "  3. Launch from Homebrew Menu"
     echo ""

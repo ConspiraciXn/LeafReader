@@ -1,6 +1,20 @@
-# ReaderNX
+# LeafReader
 
-Ebook reader for Nintendo Switch, forked from [EbookViewerNX](https://github.com/SegFault42/ebookViewerNX).
+Ebook reader for Nintendo Switch, forked from [ReaderNX](https://github.com/guyiicn/ReaderNX), originally based on [EbookViewerNX](https://github.com/SegFault42/ebookViewerNX).
+
+This initial LeafReader version adds a leaf icon and updates the application name.
+The Switch build produces `LeafReader.nro`, independently of the checkout folder name.
+Books and reading progress continue to use `/switch/ebookViewerNX/`.
+See [the initial device check](doc/leafreader-first-test.md) for validation steps.
+
+## GitHub Actions build
+
+The **Build LeafReader for Switch** workflow builds pushes and pull requests,
+and can also be started from **Actions > Build LeafReader for Switch > Run workflow**.
+It uses the official `devkitpro/devkita64` container, without running the legacy
+package installation scripts. Download `LeafReader-Switch-<run number>` from a
+successful run's **Artifacts** section and extract `LeafReader.nro` for your SD card.
+The artifact also records the toolchain image digest, package versions and NRO checksum.
 
 ## Features
 
@@ -14,7 +28,7 @@ Ebook reader for Nintendo Switch, forked from [EbookViewerNX](https://github.com
 
 ## Usage
 
-1. Copy `ReaderNX.nro` to `/switch/` folder on your SD card
+1. Copy `LeafReader.nro` to `/switch/` folder on your SD card
 2. Create folder `/switch/ebookViewerNX/` and put your ebooks there
 3. Launch from Homebrew Menu
 
@@ -66,7 +80,7 @@ This will:
 - Build MuPDF (takes 5-10 minutes)
 - Build ReaderNX
 
-Output: `ReaderNX.nro` in project root.
+Output: `LeafReader.nro` in project root.
 
 **Alternative - Step by step:**
 ```bash
