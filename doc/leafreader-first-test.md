@@ -28,6 +28,29 @@ la cabecera NRO0, el nombre LeafReader en NACP y que el JPEG incrustado coincide
 con `icon.jpg`. El ejecutable ocupa 46,978,293 bytes. Estas comprobaciones no
 sustituyen la prueba de arranque y lectura en la Switch.
 
+## Correccion del primer fallo en consola
+
+La primera version fallo al cargar la caratula, tanto desde Album como desde
+un juego. Se reconstruyo el mismo NRO (SHA256 identico) con simbolos y se
+resolvieron los offsets de la captura: `0x556acc` en `fz_push_try`, `0x6560`
+en `draw_cover`, `0x6ed0` en `draw_home_menu` y `0x73ac` en `home_page`.
+
+Las cabeceras del submodulo son MuPDF 1.16.1 y el contenedor incluye
+`switch-mupdf 1.17.0-1`. El orden de busqueda del enlace elegia la biblioteca
+del contenedor; `fz_new_context` rechaza versiones distintas, y el llamador
+ignoraba ese fallo antes de abrir el documento.
+
+La correccion `8b91f6e` prioriza las bibliotecas del submodulo, comprueba el
+resultado de inicializacion y limpia los punteros al cerrar el documento.
+Tambien sustituye el buffer fijo de la cache por escritura PNG y corrige
+la ruta usada para leer la caratula guardada. La metadata del libro se abre
+tambien cuando la imagen esta en cache.
+
+[Compilacion corregida](https://github.com/ConspiraciXn/LeafReader/actions/runs/39718979338):
+exitosa, incluyendo comprobaciones del mapa de enlace para ambas bibliotecas
+MuPDF locales y ausencia de la biblioteca MuPDF del contenedor. Pendiente de
+confirmar en consola: primer arranque, reapertura con cache y apertura del libro.
+
 ### Alternativa local
 
 Preparar un entorno Linux con devkitPro, libnx, las bibliotecas SDL2 y las
