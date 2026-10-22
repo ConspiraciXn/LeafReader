@@ -11,16 +11,22 @@
 ## Estado del entorno
 
 Codigo y submodulos descargados. Icono verificado como JPEG de 256 x 256.
-No se ha compilado ni probado en consola: este equipo Windows aun no tiene
-devkitPro ni WSL instalados. El cambio del icono requiere reconstruir el NRO;
+Compilacion de Switch completada en GitHub Actions; pendiente la prueba en consola.
+Este equipo Windows aun no tiene devkitPro ni WSL instalados.
+El cambio del icono requiere reconstruir el NRO;
 copiar `icon.jpg` a la SD no cambia el icono de un ejecutable existente.
 
 ## Compilacion
 
 La ruta principal es GitHub Actions: abrir **Actions > Build LeafReader for Switch**,
 ejecutar el workflow y descargar el artifact de una ejecucion exitosa. Incluye el
-NRO, su checksum y las versiones del entorno. La primera ejecucion remota aun
-esta pendiente; tener el workflow preparado no confirma que la compilacion pase.
+NRO, su checksum y las versiones del entorno.
+
+Primera compilacion verificada: [Actions run 39717521100](https://github.com/ConspiraciXn/LeafReader/actions/runs/39717521100),
+commit `a4667820d0c9e76241f853ec44112320479113ad`. Se comprobo el checksum SHA256,
+la cabecera NRO0, el nombre LeafReader en NACP y que el JPEG incrustado coincide
+con `icon.jpg`. El ejecutable ocupa 46,978,293 bytes. Estas comprobaciones no
+sustituyen la prueba de arranque y lectura en la Switch.
 
 ### Alternativa local
 
