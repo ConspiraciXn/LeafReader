@@ -66,7 +66,7 @@ CFLAGS	+=	-D__NXLINK__ $(INCLUDE) -DLOG_USE_COLOR # -D__TWILI__
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
+LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(TOPDIR)/$(TARGET).map
 
 LIBS	:=	-lSDL2 -lSDL2_ttf -lSDL2_image -lwebp -lEGL -lglapi -ldrm_nouveau `sdl2-config --libs` -larchive -lzstd -llzma -lstdc++ -lnx -lmupdf -Wl,--allow-multiple-definition -lharfbuzz -lmupdf-third -lfreetype -lm -ljpeg -lpng -lbz2 -lz
 
@@ -74,7 +74,8 @@ LIBS	:=	-lSDL2 -lSDL2_ttf -lSDL2_image -lwebp -lEGL -lglapi -ldrm_nouveau `sdl2-
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS) $(LIBNX) $(CURDIR)/libs/mupdf $(CURDIR)/libs/archive
+# MuPDF headers and archives must come from the same submodule version.
+LIBDIRS	:= $(CURDIR)/libs/mupdf $(PORTLIBS) $(LIBNX) $(CURDIR)/libs/archive
 
 
 #---------------------------------------------------------------------------------

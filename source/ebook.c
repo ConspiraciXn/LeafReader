@@ -24,6 +24,7 @@ bool	init_mupdf(void)
 	fz_catch(ebook->ctx) {
 		log_fatal("cannot register document handlers: %s\n", fz_caught_message(ebook->ctx));
 		fz_drop_context(ebook->ctx);
+		ebook->ctx = NULL;
 		return (false);
 	}
 
@@ -33,13 +34,22 @@ bool	init_mupdf(void)
 
 void	deinit_mupdf(void)
 {
-	fz_drop_document(ebook->ctx, ebook->doc);
-	fz_drop_context(ebook->ctx);
+	if (ebook->ctx != NULL) {
+		fz_drop_pixmap(ebook->ctx, ebook->ppm);
+		fz_drop_document(ebook->ctx, ebook->doc);
+		fz_drop_context(ebook->ctx);
+	}
+	ebook->ppm = NULL;
+	ebook->doc = NULL;
+	ebook->ctx = NULL;
 	log_info("deinit_mupdf() [Success]");
 }
 
 bool	open_ebook(char *path)
 {
+	if (ebook->ctx == NULL) {
+		return (false);
+	}
 	/* Open the document. */
 	fz_try(ebook->ctx) {
 		ebook->doc = fz_open_document(ebook->ctx, path);
@@ -55,6 +65,9 @@ bool	open_ebook(char *path)
 
 bool	count_page_number(void)
 {
+	if (ebook->ctx == NULL || ebook->doc == NULL) {
+		return (false);
+	}
 	/* Count the number of pages. */
 	fz_try(ebook->ctx) {
 		ebook->total_page = fz_count_pages(ebook->ctx, ebook->doc);
@@ -82,14 +95,24 @@ bool	convert_page_to_ppm(int current_page)
 	return (true);
 }
 
-void	get_page_info(int current_page)
+bool	get_page_info(int current_page)
 {
-	// get size of page
-	trans->page = fz_load_page(ebook->ctx, ebook->doc, current_page);
-	trans->bounds = fz_bound_page(ebook->ctx, trans->page);
-	fz_drop_page(ebook->ctx, trans->page);
+	fz_page *page = NULL;
+	fz_var(page);
+	fz_try(ebook->ctx) {
+		page = fz_load_page(ebook->ctx, ebook->doc, current_page);
+		trans->bounds = fz_bound_page(ebook->ctx, page);
+	}
+	fz_always(ebook->ctx) {
+		fz_drop_page(ebook->ctx, page);
+	}
+	fz_catch(ebook->ctx) {
+		log_warn("cannot load page: %s", fz_caught_message(ebook->ctx));
+		return (false);
+	}
 
 	log_info("get_page_info() [Success]");
+	return (true);
 }
 
 static bool	render_page(char *book, int current_page)
@@ -105,8 +128,7 @@ static bool	render_page(char *book, int current_page)
 	strcat(path, EBOOK_PATH);
 	strcat(path, book);
 
-	init_mupdf();
-	if (open_ebook(path) == false) {
+	if (init_mupdf() == false || open_ebook(path) == false || count_page_number() == false) {
 		deinit_mupdf();
 		free(path);
 		path = NULL;
@@ -117,13 +139,16 @@ static bool	render_page(char *book, int current_page)
 	path = NULL;
 
 	// check out of range index
-	if (ebook->total_page < 0 || current_page >= ebook->total_page) {
+	if (current_page < 0 || ebook->total_page <= 0 || current_page >= ebook->total_page) {
 		log_fatal("page number out of range: %d (page count %d)\n", ebook->total_page + 1, current_page);
 		deinit_mupdf();
 		return (false);
 	}
 
-	get_page_info(current_page);
+	if (get_page_info(current_page) == false) {
+		deinit_mupdf();
+		return (false);
+	}
 
 	if (ebook->layout_orientation == PORTRAIT) {
 		portrait_default(DEFAULT);
@@ -141,6 +166,7 @@ static bool	render_page(char *book, int current_page)
 	draw_ppm(ebook->ppm, READ);
 
 	fz_drop_pixmap(ebook->ctx, ebook->ppm);
+	ebook->ppm = NULL;
 	deinit_mupdf();
 
 	log_info("render_page() [Success]");

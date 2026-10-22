@@ -37,6 +37,14 @@ mkdir -p libs/mupdf/lib
 cp libs/mupdf/build/release/libmupdf.a libs/mupdf/lib/
 cp libs/mupdf/build/release/libmupdf-third.a libs/mupdf/lib/
 make -j2
+# Prevent accidentally linking the container's MuPDF against submodule headers.
+test -s LeafReader.map
+grep -Fq '/libs/mupdf/lib/libmupdf.a(' LeafReader.map
+grep -Fq '/libs/mupdf/lib/libmupdf-third.a(' LeafReader.map
+if grep -Fq '/portlibs/switch/lib/libmupdf.a(' LeafReader.map; then
+  echo 'Mixed MuPDF versions in link map' >&2
+  exit 1
+fi
 test -s LeafReader.nro
 sha256sum LeafReader.nro > LeafReader.nro.sha256
 
